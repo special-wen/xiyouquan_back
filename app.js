@@ -1,29 +1,27 @@
 var createError = require('http-errors');
 var express = require('express');
+var router = express.Router();
 var path = require('path');
 var cookieParser = require('cookie-parser');
+const session = require('express-session');
+const Store = require('express-mysql-session');
+var bodyParser = require('body-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var http = require('http');
-
-var index = require('./routes/index');
-
+const login = require('./routes/login');
+const sign = require('./routes/sign');
+const config = require('./routes/config');
+const hotTopic = require('./routes/hotTopic');
 var app = express();
-
 const db_config = {
-  host: 'localhost',
-  user: 'root',
-  password: "zxwzxwzxw",
-  database: 'xiyouquan',
-  port: 3306
-} 
-
-app.use(cors({
-  origin:['http://localhost:8080'],
-  methods:['GET','POST'],
-  allowedHeaders:['Conten-type','Authorization']
-}))
-// view engine setup
+  host: '127.0.0.1', //主机
+  user: 'root',     //数据库用户名
+  password: 'zxwzxwzxw',     //数据库密码
+  port: '3306',       
+  database: 'xiyouquan', //数据库名称
+  charset: 'UTF8_GENERAL_CI' //数据库编码
+};
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -31,9 +29,25 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/login',index);
-// catch 404 and forward to error handler
+app.use(session({
+  secret:'xiyouquan',
+  store:new Store(db_config),
+  resave: false,
+  saveUninitialized: true,
+  cookie : {
+    maxAge : 1000 * 60 * 3, // 设置 session 的有效时间，单位毫秒
+  }
+}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+
+//后端请求api
+app.use('/api',login);
+app.use('/api',sign);
+app.use('/api',config);
+app.use('/api',hotTopic);
+
 app.use(function(req, res, next) {
   next(createError(404));
 });
@@ -47,9 +61,5 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
-});
-
-app.listen(3000, () => {
-  console.log('server start');
 });
 module.exports = app;
