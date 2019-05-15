@@ -18,34 +18,45 @@ router.get('/hotFlowChild',(req,res) => {
     } else {
       count = 10;
     }
-    hotflowChild.map(item => {
-      let hotflow_info = {
-        "uid":item.uid,
-        "text":item.text,
-        "cid":item.cid,
-        "created_at":item.created_at
-      };
-    // 根据uid获取用户信息
-		let userInfo_sql = 'select * from user where uid = ?';
-    db.query(userInfo_sql,item.uid,(err,user_info) => {
-			if (err) {
-				console.log(err);
-				return;
-			}
-			hotflow_info.screen_name = user_info[0].screen_name;
-      hotflow_info.user_header_img = user_info[0].user_header_img;
-      arr.push(hotflow_info);
-      if (arr.length === hotflowChild.length) {
-        res.json({
-          "ok":1,
-          "data":{
-            "childHotFlow":arr
-          },
-          "count":count
-        })
-      }
-		})
-    })
+    if (hotflowChild.length === 0) {
+      res.json({
+        "ok":1,
+        "data":{
+          "childHotFlow":hotflowChild
+        },
+        "count":count
+      })
+    } else {
+      hotflowChild.map(item => {
+        let hotflow_info = {
+          "uid":item.uid,
+          "text":item.text,
+          "cid":item.cid,
+          "created_at":item.created_at
+        };
+      // 根据uid获取用户信息
+      let userInfo_sql = 'select * from user where uid = ?';
+      db.query(userInfo_sql,item.uid,(err,user_info) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        hotflow_info.screen_name = user_info[0].screen_name;
+        hotflow_info.user_header_img = user_info[0].user_header_img;
+        arr.push(hotflow_info);
+        if (arr.length === hotflowChild.length) {
+          res.json({
+            "ok":1,
+            "data":{
+              "childHotFlow":arr
+            },
+            "count":count
+          })
+        }
+      })
+      })
+    }
+    
 	})
 })
 module.exports = router;

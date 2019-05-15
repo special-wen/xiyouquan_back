@@ -20,34 +20,45 @@ router.get('/like',function(req,res,next) {
     } else {
       count = 10;
     }
-    like_list.map((like) => {
-      let likeList = {
-        "created_at":like.created_at,
-        "uid":like.uid,
-        "topic_id":like.topic_id
-      }
-      // 根据uid查找user信息
-      let userInfo_sql = 'select * from user where uid = ?';
-      db.query(userInfo_sql,like.uid,(err,user_info) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        likeList.screen_name = user_info[0].screen_name;
-        likeList.user_header_img = user_info[0].user_header_img;
-        arr.push(likeList);
-        if (arr.length === like_list.length) {
-          // console.log(arr);
-          res.json({
-            "ok":1,
-            "data":{
-              "data":arr
-            },
-            "count":count
-          })
-        }
+    if (like_list.length === 0) {
+      res.json({
+        "ok":1,
+        "data":{
+          "data":like_list
+        },
+        "count":count
       })
-    })
+    } else {
+      like_list.map((like) => {
+        let likeList = {
+          "created_at":like.created_at,
+          "uid":like.uid,
+          "topic_id":like.topic_id
+        }
+        // 根据uid查找user信息
+        let userInfo_sql = 'select * from user where uid = ?';
+        db.query(userInfo_sql,like.uid,(err,user_info) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          likeList.screen_name = user_info[0].screen_name;
+          likeList.user_header_img = user_info[0].user_header_img;
+          arr.push(likeList);
+          if (arr.length === like_list.length) {
+            // console.log(arr);
+            res.json({
+              "ok":1,
+              "data":{
+                "data":arr
+              },
+              "count":count
+            })
+          }
+        })
+      })
+    }
+   
   })
 })
 module.exports = router;

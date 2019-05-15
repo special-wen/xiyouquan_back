@@ -11,30 +11,40 @@ router.get('/hotflow',(req,res) => {
 			console.log(err);
 			return;
 		}
-		let hotflow_info = {
-			"uid":hotflow[0].uid,
-			"text":hotflow[0].text,
-			"topic_id":hotflow[0].topic_id,
-			"cid":hotflow[0].cid,
-			"created_at":hotflow[0].created_at
-		};
-		// 根据uid获取用户信息
-		let userInfo_sql = 'select * from user where uid = ?';
-		console.log(hotflow[0].uid)
-    db.query(userInfo_sql,hotflow[0].uid,(err,user_info) => {
-			if (err) {
-				console.log(err);
-				return;
-			}
-			hotflow_info.screen_name = user_info[0].screen_name;
-			hotflow_info.user_header_img = user_info[0].user_header_img;
+		// console.log(hotflow,'==');
+		if (hotflow.length === 0) {
 			res.json({
-				"ok":1,
-				"data":{
-					"hotflow":hotflow_info
+        "ok":1,
+        "data":{
+          "hotflow":hotflow
+        }
+      })
+		} else {
+			let hotflow_info = {
+				"uid":hotflow[0].uid,
+				"text":hotflow[0].text,
+				"topic_id":hotflow[0].topic_id,
+				"cid":hotflow[0].cid,
+				"created_at":hotflow[0].created_at
+			};
+			// 根据uid获取用户信息
+			let userInfo_sql = 'select * from user where uid = ?';
+			db.query(userInfo_sql,hotflow[0].uid,(err,user_info) => {
+				if (err) {
+					console.log(err);
+					return;
 				}
+				hotflow_info.screen_name = user_info[0].screen_name;
+				hotflow_info.user_header_img = user_info[0].user_header_img;
+				res.json({
+					"ok":1,
+					"data":{
+						"hotflow":hotflow_info
+					}
+				})
 			})
-		})
+		}
+		
 	})
 })
 module.exports = router;

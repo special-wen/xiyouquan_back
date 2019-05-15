@@ -26,6 +26,11 @@ const studyTopic = require('./routes/studyTopic');
 const foodTopic = require('./routes/foodTopic');
 const friendsTopic = require('./routes/friendsTopic');
 const edit = require('./routes/edit');
+const change = require('./routes/change');
+const pics = require('./routes/pics');
+const pageInfo = require('./routes/pageInfo');
+const logout = require('./routes/logout');
+// const logout = require('./routes/logout');
 
 var app = express();
 const db_config = {
@@ -49,7 +54,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie : {
-    maxAge : 1000 * 60 * 3, // 设置 session 的有效时间，单位毫秒
+    maxAge : 1000 * 60 * 60 * 1, // 设置 session 的有效时间，单位毫秒
   }
 }));
 app.use(bodyParser.json());
@@ -76,6 +81,11 @@ app.use('/api',studyTopic);
 app.use('/api',foodTopic);
 app.use('/api',friendsTopic);
 app.use('/api',edit);
+app.use('/api',change);
+app.use('/api',pics);
+app.use('/api',pageInfo);
+app.use('/api',logout);
+
 
 app.use(function(req, res, next) {
   next(createError(404));
