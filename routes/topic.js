@@ -7,7 +7,7 @@ router.get('/topic', function(req, res, next) {
   const cur_page = req.query.page;
   let limit_page = (cur_page-1)*10;
   // 获取uid的topic信息
-  let topic_sql = 'select t.topic_id,t.text,t.uid,t.created_at,t.pics,p.screen_name,p.uid,p.user_header_img from topic as t,user as p where p.uid = ? and t.uid = p.uid order by created_at desc limit ?,?'
+  let topic_sql = 'select t.topic_id,t.text,t.uid,t.created_at,t.pics,t.type,p.screen_name,p.uid,p.user_header_img from topic as t,user as p where p.uid = ? and t.uid = p.uid order by created_at desc limit ?,?'
   db.query(topic_sql,[uid,limit_page,10],(err,topic_cards) => {
     if (err) {
       console.log("查询失败");
@@ -20,7 +20,6 @@ router.get('/topic', function(req, res, next) {
     } else {
       counts = 10;
     }
-    console.log(topic_cards);
     if (topic_cards.length > 0) {
       topic_cards.map(item => {
         //更改图片格式
